@@ -1,28 +1,30 @@
-import toobusy from "node-toobusy";
+const toobusy = require("node-toobusy");
 import express from "express";
 import path from "path";
-import favicon from "serve-favicon";
-import logger from "morgan";
-import loggerutil from "../utilities/logger";
-import datalogger from "../utilities/datalogger";
+const favicon = require("serve-favicon");
+const logger = require("morgan");
+import { LoggerUtil } from "../utilities/logger";
+import { DataLogger } from "../utilities/datalogger";
 import fs from "fs";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import hbs from "express-handlebars";
+const hbs = require("express-handlebars");
 import rfs from "rotating-file-stream";
-import helmet from "helmet";
-import compression from "compression";
+const helmet = require("helmet");
+const compression = require("compression");
 
 // Defining routes
 import { Routes } from "../routes";
 
-class App {
+export class App {
 
     public app: express.Application;
     public router: Routes = new Routes();
     public rootDirectory = __dirname.substring(0, __dirname.length-4);
-    public logDirectory;
-    public accessLogStream;
+    public logDirectory: any;
+    public accessLogStream: any;
+    public loggerUtil = new LoggerUtil();
+    public dataLogger = new DataLogger();
 
     constructor() {
       // Generating an express app
@@ -109,7 +111,7 @@ class App {
       }));
 
       // uncomment to redirect global console object to log file
-      // datalogger.logfile();
+      this.dataLogger.logfile();
 
       // Allowing access headers and requests
       this.app.use(function(req, res, next) {
@@ -134,13 +136,13 @@ class App {
 
       // catch 404 and forward to error handler
       this.app.use(function(req, res, next) {
-        var err = new Error('Not Found');
+        var err: any = new Error('Not Found');
         err.status = 404;
         next(err);
       });
 
       // error handler
-      this.app.use(function(err, req, res, next) {
+      this.app.use(function(err: any, req: any, res: any, next: any) {
         // set locals, only providing error in development
         res.locals.message = err.message;
         res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -154,17 +156,15 @@ class App {
 
       // globally catching unhandled promise rejections
       process.once('unhandledRejection', (reason, promise) => {
-         console.error('Unhandled Rejection at promise '+promise+' reason ', reason);
+         console.error('Unhandled Rejection at promise ' + promise + ' reason ', reason + '\n');
          console.log('Server is still running...\n');
       });
 
       // globally catching unhandled exceptions
       process.once('uncaughtException', (error) => {
-         console.error('Uncaught Exception is thrown with ',error+'\n');
+         console.error('Uncaught Exception is thrown with ', error + '\n');
          console.log('Server is still running...\n');
       });
     }
 
 }
-
-export default new App().app;

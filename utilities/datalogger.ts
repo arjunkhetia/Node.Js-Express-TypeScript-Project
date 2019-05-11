@@ -1,14 +1,16 @@
 import fs from "fs";
 
-module.exports = {
-  // redirect global console object to log file
-  logfile: function() {
-    const Console = console.constructor;
-    var con = new Console(fs.createWriteStream('./log/ServerData.log', {'flags': 'a'}));
+export class DataLogger {
+
+  public logfile() {
+    // redirect global console object to log file
+    const Console: any = console.constructor;
+    var con = Console(fs.createWriteStream('./log/ServerData.log', {'flags': 'a'}));
     Object.keys(Console.prototype).forEach(name => {
-        console[name] = function() {
+        eval('console')[name] = function() {
             con[name].apply(con, arguments);
         };
     });
   }
-};
+
+}

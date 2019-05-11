@@ -2,8 +2,8 @@
  * Module dependencies.
  */
 const cluster = require('cluster');
-import normalizePort from "normalize-port";
-import app from "./app";
+const normalizePort = require("normalize-port");
+import { App } from "./app";
 // comment below line to start cluster with maximum workers
 const workers = 1;
 // uncomment below line to start cluster with maximum workers
@@ -15,7 +15,7 @@ if (cluster.isMaster) {
     var worker = cluster.fork().process;
     console.log('worker %s on %s started', i+1, worker.pid);
   }
-  cluster.on('exit', function(worker, code, signal) {
+  cluster.on('exit', function(worker: any, code: any, signal: any) {
     console.log('worker %s died. restarting...', worker.process.pid);
     cluster.fork();
   });
@@ -25,11 +25,11 @@ if (cluster.isWorker) {
   const http = require('http');
   const debug = require('debug')('node-express-typescript-project:server');
   const ON_DEATH = require('death');
+  const app = new App();
   /**
    * Get port from environment and store in Express.
    */
   const port = normalizePort(process.env.PORT || '3000');
-  app.set('port', port);
   /**
    * Create HTTP server.
    */
@@ -53,7 +53,7 @@ if (cluster.isWorker) {
   /**
    * Event listener for HTTP server "error" event.
    */
-  server.on('error', (error) => {
+  server.on('error', (error: any) => {
     if (error.syscall !== 'listen') {
       throw error;
     }
@@ -78,7 +78,7 @@ if (cluster.isWorker) {
    * Event listener for HTTP server "close" event.
    * It sets the callback on SIGINT, SIGQUIT & SIGTERM.
    */
-   ON_DEATH(function(signal, err) {
+   ON_DEATH(function(signal: any, err: any) {
      console.log('\nServer is going down now...');
      server.close();
      process.exit();
