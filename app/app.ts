@@ -111,7 +111,7 @@ export class App {
       }));
 
       // uncomment to redirect global console object to log file
-      this.dataLogger.logfile();
+      // this.dataLogger.logfile();
 
       // Allowing access headers and requests
       this.app.use(function(req, res, next) {
