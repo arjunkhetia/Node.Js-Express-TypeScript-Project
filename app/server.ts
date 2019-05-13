@@ -1,7 +1,8 @@
 /**
  * Module dependencies.
  */
-const cluster = require('cluster');
+// const cluster = require('cluster');
+import cluster from "cluster";
 const normalizePort = require("normalize-port");
 import { App } from "./app";
 // comment below line to start cluster with maximum workers

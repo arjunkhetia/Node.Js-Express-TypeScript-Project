@@ -25,13 +25,19 @@ Start Express.js app at `http://localhost:3000/`:
 $ npm start
 ```
 
+Compile all TypeScript (.ts) files and produce JavaScript (.js) files to run on node server:
+
+```bash
+$ npm run tsc
+```
+
 # Nodejs Cluster
 
 Node.js runs in a single process, by default. Ideally, we want one process for each CPU core, so we can distribute the workload across all the cores. Hence improving the scalability of web apps handling HTTP requests and performance in general. In addition to this, if one worker crashes, the others are still available to handle requests.
 
-```js
-var cluster = require('cluster');
-var workers = process.env.WORKERS || require('os').cpus().length;
+```ts
+import cluster from "cluster";
+const workers = process.env.WORKERS || require('os').cpus().length;
 
 if (cluster.isMaster) {
   console.log('Master cluster is running on %s with %s workers', process.pid, workers);
@@ -39,7 +45,7 @@ if (cluster.isMaster) {
     var worker = cluster.fork().process;
     console.log('worker %s on %s started', i+1, worker.pid);
   }
-  cluster.on('exit', function(worker, code, signal) {
+  cluster.on('exit', function(worker: any, code: any, signal: any) {
     console.log('worker %s died. restarting...', worker.process.pid);
     cluster.fork();
   });
@@ -54,19 +60,19 @@ if (cluster.isWorker) {
 
 Morgan - HTTP request logger middleware for node.js:
 
-```js
-var logger = require('morgan');
-app.use(logger('dev'));
-app.use(logger(':remote-addr :remote-user :datetime :req[header] :method :url HTTP/:http-version :status :res[content-length] :res[header] :response-time[digits] :referrer :user-agent', {
-    stream: accessLogStream
+```ts
+const logger = require("morgan");
+this.app.use(logger('dev'));
+this.app.use(logger(':remote-addr :remote-user :datetime :req[header] :method :url HTTP/:http-version :status :res[content-length] :res[header] :response-time[digits] :referrer :user-agent', {
+    stream: this.accessLogStream
 }));
 ```
 
 Winston - is designed to be a simple and universal logging library with support for multiple transports:
 
 ```js
-var winston = require('winston');
-var logger = winston.createLogger({
+import winston from "winston";
+public logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.colorize({
         all: true
@@ -91,9 +97,10 @@ var logger = winston.createLogger({
 
 To provide an automated rotation of Express/Connect logs or anything else that writes to a log on a regular basis that needs to be rotated based on date.
 
-```js
-var rfs    = require('rotating-file-stream');
-var accessLogStream = rfs('file.log', {
+```ts
+import rfs from "rotating-file-stream";
+public accessLogStream: any;
+this.accessLogStream = rfs('file.log', {
     size:     '10M', // rotate every 10 MegaBytes written
     interval: '1d', // rotate daily
     compress: 'gzip' // compress rotated files
@@ -105,8 +112,8 @@ var accessLogStream = rfs('file.log', {
 
 Express Status Monitor is simple, self-hosted module based on Socket.io and Chart.js to report realtime server metrics for Express-based ode servers.
 
-```js
-app.use(require('express-status-monitor')({
+```ts
+this.app.use(require('express-status-monitor')({
   title: 'Server Status', // title for status screen
   path: '/status', // path for server status invokation
   spans: [{
