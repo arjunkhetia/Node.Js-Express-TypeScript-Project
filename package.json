@@ -30,7 +30,7 @@
     "node-toobusy": "^0.6.3",
     "normalize-port": "^1.0.0",
     "path": "^0.12.7",
-    "rotating-file-stream": "^1.4.6",
+    "rotating-file-stream": "^2.0.0",
     "serve-favicon": "^2.5.0",
     "winston": "^3.2.1"
   },
@@ -38,7 +38,7 @@
     "@types/async": "^3.0.3",
     "@types/body-parser": "^1.17.1",
     "@types/cookie-parser": "^1.4.2",
-    "ts-node-dev": "^1.0.0-pre.39",
-    "typescript": "^3.7.2"
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.7.4"
   }
 }

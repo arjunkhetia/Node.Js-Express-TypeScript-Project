@@ -9,7 +9,7 @@ import fs from "fs";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 const hbs = require("express-handlebars");
-import rfs from "rotating-file-stream";
+import * as rfs from "rotating-file-stream";
 const helmet = require("helmet");
 const compression = require("compression");
 
@@ -94,8 +94,10 @@ export class App {
       this.app.set('view engine', 'hbs');
 
       // Create a rotating write stream
-      this.accessLogStream = rfs('Server.log', {
+      this.accessLogStream = rfs.createStream('Server.log', {
+          size: "10M", // rotate every 10 MegaBytes written
           interval: '1d', // rotate daily
+          compress: "gzip", // compress rotated files
           path: this.logDirectory
       });
 
