@@ -1,6 +1,8 @@
 /**
  * Module dependencies.
  */
+// A tool to find an open port or domain socket on the machine
+import portfinder from "portfinder";
 // const cluster = require('cluster');
 import cluster from "cluster";
 const normalizePort = require("normalize-port");
@@ -9,16 +11,26 @@ import { App } from "./app";
 const workers = 1;
 // uncomment below line to start cluster with maximum workers
 // const workers = process.env.WORKERS || require('os').cpus().length;
+var port = 3000;
+var portSpan = 999;
 
 if (cluster.isMaster) {
-  console.log('Master cluster is running on %s with %s workers', process.pid, workers);
-  for (var i = 0; i < workers; ++i) {
-    var worker = cluster.fork().process;
-    console.log('worker %s on %s started', i+1, worker.pid);
-  }
-  cluster.on('exit', function(worker: any, code: any, signal: any) {
-    console.log('worker %s died. restarting...', worker.process.pid);
-    cluster.fork();
+  portfinder.getPort({
+    port: port,    // minimum port number
+    stopPort: port + portSpan // maximum port number
+  }, function (err, openPort) {
+    if (err) throw err;
+    port = openPort;
+    console.log('Server will start on port ' + port);
+    console.log('Master cluster is running on %s with %s workers', process.pid, workers);
+    for (var i = 0; i < workers; ++i) {
+      var worker = cluster.fork().process;
+      console.log('worker %s on %s started', i+1, worker.pid);
+    }
+    cluster.on('exit', function(worker, code, signal) {
+      console.log('worker %s died. restarting...', worker.process.pid);
+      cluster.fork();
+    });
   });
 }
 
@@ -30,7 +42,7 @@ if (cluster.isWorker) {
   /**
    * Get port from environment and store in Express.
    */
-  const port = normalizePort(process.env.PORT || '3000');
+  port = normalizePort(process.env.PORT || port);
   /**
    * Create HTTP server.
    */
