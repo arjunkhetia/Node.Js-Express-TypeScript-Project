@@ -21,6 +21,7 @@ if (cluster.isMaster) {
   }, function (err, openPort) {
     if (err) throw err;
     port = openPort;
+    process.env['PORT'] = openPort.toString();
     console.log('Server will start on port ' + port);
     console.log('Master cluster is running on %s with %s workers', process.pid, workers);
     for (var i = 0; i < workers; ++i) {
@@ -42,7 +43,7 @@ if (cluster.isWorker) {
   /**
    * Get port from environment and store in Express.
    */
-  port = normalizePort(process.env.PORT || port);
+  port = normalizePort(process.env['PORT']);
   /**
    * Create HTTP server.
    */
