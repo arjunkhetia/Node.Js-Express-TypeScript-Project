@@ -1,17 +1,16 @@
 const toobusy = require("node-toobusy");
 import express from "express";
 import path from "path";
-const favicon = require("serve-favicon");
-const logger = require("morgan");
+import favicon from "serve-favicon";
+import logger from "morgan";
 import { LoggerUtil } from "../utilities/logger";
 import { DataLogger } from "../utilities/datalogger";
 import fs from "fs";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-const hbs = require("express-handlebars");
+import { create } from 'express-handlebars';
 import * as rfs from "rotating-file-stream";
-const helmet = require("helmet");
-const compression = require("compression");
+import helmet from "helmet";
+import compression from "compression";
 
 // Defining routes
 import { Routes } from "../routes";
@@ -37,6 +36,7 @@ export class App {
       this.app.use(require('express-status-monitor')({
         title: 'Server Status',
         path: '/status',
+        // socketPath: '/socket.io', // In case you use a custom path for socket.io
         // websocket: existingSocketIoInstance,
         spans: [{
           interval: 1,
@@ -52,6 +52,8 @@ export class App {
           cpu: true,
           mem: true,
           load: true,
+          eventLoop: true,
+          heap: true,
           responseTime: true,
           rps: true,
           statusCodes: true
@@ -61,7 +63,8 @@ export class App {
           host: 'localhost',
           path: '/',
           port: '3000'
-        }]
+        }],
+        // ignoreStartsWith: '/admin'
       }));
 
       // compress all responses
@@ -85,13 +88,14 @@ export class App {
       });
 
       // view engine setup - Express-Handlebars
-      this.app.engine('hbs', hbs({
-          extname: 'hbs',
-          defaultLayout: 'layout',
-          layoutsDir: this.rootDirectory + '/views/'
-      }));
-      this.app.set('views', path.join(this.rootDirectory, '/views'));
-      this.app.set('view engine', 'hbs');
+      const hbs = create({
+        extname: '.hbs',
+        defaultLayout: 'layout',
+        layoutsDir: __dirname + '/views/'
+      });
+      this.app.engine('hbs', hbs.engine);
+      this.app.set('view engine', '.hbs');
+      this.app.set('views', path.join(__dirname, 'views'));
 
       // Create a rotating write stream
       this.accessLogStream = rfs.createStream('Server.log', {
@@ -126,8 +130,8 @@ export class App {
       // Helmet helps for securing Express apps by setting various HTTP headers
       this.app.use(helmet());
 
-      this.app.use(bodyParser.json());
-      this.app.use(bodyParser.urlencoded({ extended: true }));
+      this.app.use(express.json());
+      this.app.use(express.urlencoded({ extended: true }));
       this.app.use(cookieParser());
       this.app.use(express.static(path.join(this.rootDirectory, 'public')));
 
