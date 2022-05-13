@@ -1,4 +1,4 @@
-# Node-Express-TypeScript Project   ![Version][version-image]
+# Node Express TypeScript Project   ![Version][version-image]
 
 ![Linux Build][linuxbuild-image]
 ![Windows Build][windowsbuild-image]
